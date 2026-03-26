@@ -101,29 +101,18 @@ function toast(msg, type='success'){
   setTimeout(()=>{ t.classList.add('fade-out'); setTimeout(()=>t.remove(),350); }, 3500);
 }
 
-// ===================== DATA STORE =====================
 let state = {
   currentUser: null,
-  users: [
-    {id:1,fname:'Admin',lname:'User',email:'admin@company.com',password:'admin123',role:'admin',created:new Date('2024-01-01')},
-    {id:2,fname:'Jane',lname:'Smith',email:'user@company.com',password:'user123',role:'user',created:new Date('2024-02-01')},
-  ],
-  employees: [
-    {id:1,fname:'Alex',lname:'Thompson',email:'alex.t@company.com',dept:'Engineering',position:'Senior Engineer',role:'admin',status:'active',salary:95000,joined:'2022-03-15'},
-    {id:2,fname:'Maya',lname:'Patel',email:'maya.p@company.com',dept:'Design',position:'UX Designer',role:'user',status:'active',salary:78000,joined:'2022-07-20'},
-    {id:3,fname:'Jordan',lname:'Williams',email:'jordan.w@company.com',dept:'Marketing',position:'Marketing Lead',role:'user',status:'active',salary:72000,joined:'2021-11-05'},
-    {id:4,fname:'Sam',lname:'Chen',email:'sam.c@company.com',dept:'Finance',position:'Financial Analyst',role:'user',status:'active',salary:85000,joined:'2023-01-12'},
-    {id:5,fname:'Riley',lname:'Johnson',email:'riley.j@company.com',dept:'HR',position:'HR Manager',role:'admin',status:'active',salary:82000,joined:'2022-06-01'},
-    {id:6,fname:'Morgan',lname:'Lee',email:'morgan.l@company.com',dept:'Operations',position:'Ops Specialist',role:'user',status:'inactive',salary:68000,joined:'2021-08-20'},
-    {id:7,fname:'Casey',lname:'Brown',email:'casey.b@company.com',dept:'Engineering',position:'Frontend Dev',role:'user',status:'active',salary:88000,joined:'2023-04-10'},
-    {id:8,fname:'Taylor',lname:'Davis',email:'taylor.d@company.com',dept:'Design',position:'Graphic Designer',role:'user',status:'active',salary:70000,joined:'2023-09-01'},
-  ],
+  employees: [],
   currentFilter: 'all',
   editId: null,
   deleteId: null,
-  nextEmpId: 9,
-  nextUserId: 3,
 };
+
+const getToken = () => localStorage.getItem('emp_token');
+const setToken = (t) => localStorage.setItem('emp_token', t);
+const clearToken = () => localStorage.removeItem('emp_token');
+const authHeader = () => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` });
 
 // ===================== AUTH =====================
 function switchTab(tab){
@@ -149,6 +138,7 @@ function doLogin(){
   .then(res => res.json().then(data => ({ status: res.status, body: data })))
   .then(({ status, body }) => {
     if (status !== 200) { showError('login-error', body.message || 'Login failed'); document.getElementById('login-btn-text').textContent='Sign In →'; return; }
+    setToken(body.token);
     state.currentUser = body.user;
     enterApp();
   })
@@ -193,7 +183,7 @@ function enterApp(){
   const greet=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
   scramble(el,greet,1200);
   
-  fetch('/api/employees')
+  fetch('/api/employees', { headers: authHeader() })
     .then(res => res.json())
     .then(data => {
       state.employees = data.employees || [];
@@ -204,6 +194,7 @@ function enterApp(){
 }
 function doLogout(){
   state.currentUser=null;
+  clearToken();
   document.getElementById('auth-screen').style.display='';
   document.getElementById('main-app').classList.remove('show');
   document.getElementById('login-email').value='';
@@ -414,7 +405,7 @@ function saveEmployee(){
   const method = state.editId ? 'PUT' : 'POST';
 
   fetch(url, {
-    method, headers: {'Content-Type': 'application/json'},
+    method, headers: authHeader(),
     body: JSON.stringify(payload)
   }).then(res => res.json())
   .then(data => {
@@ -441,7 +432,7 @@ function openDeleteModal(id){
 
 function confirmDelete(){
   const id = state.deleteId;
-  fetch(`/api/employees/${id}`, { method: 'DELETE' })
+  fetch(`/api/employees/${id}`, { method: 'DELETE', headers: authHeader() })
   .then(() => {
     state.employees=state.employees.filter(e=>e.id!==id);
     state.deleteId=null;
