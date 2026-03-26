@@ -12,8 +12,8 @@ const MONGO_URI = process.env.MONGODB_URI;
 if (!MONGO_URI) { console.error('MONGODB_URI not set in .env'); process.exit(1); }
 
 const seedUsers = [
-  { fname:'Admin', lname:'User',  email:'admin@company.com', password:'admin123', role:'admin' },
-  { fname:'Jane',  lname:'Smith', email:'user@company.com',  password:'user123',  role:'user'  },
+  { fname:'Admin', lname:'User',  email:'admin@company.com', password:'admin2026', role:'admin' },
+  { fname:'Jane',  lname:'Smith', email:'user@company.com',  password:'user2026',  role:'user'  },
 ];
 
 const seedEmployees = [
