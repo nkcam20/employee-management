@@ -142,7 +142,7 @@ function doLogin(){
   const pass=document.getElementById('login-pass').value;
   if(!email||!pass){showError('login-error','Please fill in all fields.');return;}
   document.getElementById('login-btn-text').textContent='Signing in...';
-  fetch('http://localhost:5000/api/login', {
+  fetch('/api/login', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password: pass })
   })
@@ -162,7 +162,7 @@ function doRegister(){
   if(!fname||!lname||!email||!pass){showError('reg-error','Please fill in all fields.');return;}
   if(pass.length<6){showError('reg-error','Password must be at least 6 characters.');return;}
   document.getElementById('reg-error').classList.remove('show');
-  fetch('http://localhost:5000/api/signup', {
+  fetch('/api/signup', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ fname, lname, email, password: pass })
   })
@@ -193,7 +193,7 @@ function enterApp(){
   const greet=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
   scramble(el,greet,1200);
   
-  fetch('http://localhost:5000/api/employees')
+  fetch('/api/employees')
     .then(res => res.json())
     .then(data => {
       state.employees = data.employees || [];
@@ -410,7 +410,7 @@ function saveEmployee(){
   if(!email.includes('@')){showError('emp-error','Please enter a valid email.');return;}
 
   const payload = { fname, lname, email, dept, position: pos, role, status, salary };
-  const url = state.editId ? `http://localhost:5000/api/employees/${state.editId}` : 'http://localhost:5000/api/employees';
+  const url = state.editId ? `/api/employees/${state.editId}` : '/api/employees';
   const method = state.editId ? 'PUT' : 'POST';
 
   fetch(url, {
@@ -441,7 +441,7 @@ function openDeleteModal(id){
 
 function confirmDelete(){
   const id = state.deleteId;
-  fetch(`http://localhost:5000/api/employees/${id}`, { method: 'DELETE' })
+  fetch(`/api/employees/${id}`, { method: 'DELETE' })
   .then(() => {
     state.employees=state.employees.filter(e=>e.id!==id);
     state.deleteId=null;
