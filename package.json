@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js",
-    "seed": "node seed.js",
+    "start": "node backend/server.js",
+    "seed": "node backend/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
