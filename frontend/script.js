@@ -330,10 +330,10 @@ function renderEmployeeTable(){
       <td>
         <div class="action-group">
           ${isAdmin?`
-          <button class="act-btn act-edit" onclick="openEditModal(${e.id})" title="Edit">
+          <button class="act-btn act-edit" onclick="openEditModal('${e._id}')" title="Edit">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="act-btn act-del" onclick="openDeleteModal(${e.id})" title="Delete">
+          <button class="act-btn act-del" onclick="openDeleteModal('${e._id}')" title="Delete">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           </button>
           `:
@@ -369,7 +369,7 @@ function openAddModal(){
 
 function openEditModal(id){
   if(state.currentUser?.role!=='admin'){toast('Admin access required.','error');return;}
-  const e=state.employees.find(e=>e.id===id);
+  const e=state.employees.find(e=>e._id===id);
   if(!e) return;
   state.editId=id;
   document.getElementById('modal-title').textContent='Edit Employee';
@@ -410,7 +410,7 @@ function saveEmployee(){
   }).then(res => res.json())
   .then(data => {
     if(state.editId) {
-      const idx=state.employees.findIndex(e=>e.id===state.editId);
+      const idx=state.employees.findIndex(e=>e._id===state.editId);
       state.employees[idx] = data.employee;
       toast('Employee updated successfully!','success');
     } else {
@@ -434,7 +434,7 @@ function confirmDelete(){
   const id = state.deleteId;
   fetch(`/api/employees/${id}`, { method: 'DELETE', headers: authHeader() })
   .then(() => {
-    state.employees=state.employees.filter(e=>e.id!==id);
+    state.employees=state.employees.filter(e=>e._id!==id);
     state.deleteId=null;
     closeModal('del-modal');
     toast('Employee deleted.','info');
